@@ -11,8 +11,8 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: user-service
-          uri: lb://user-service
+        - id: user-app
+          uri: lb://userApp
           predicates:
             - Path=/users/**
           filters:
@@ -30,8 +30,8 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 1000ms
                   factor: 2
-        - id: notification-service
-          uri: lb://notification-service
+        - id: notification
+          uri: lb://notification
           predicates:
             - Path=/notification/**
           filters:
