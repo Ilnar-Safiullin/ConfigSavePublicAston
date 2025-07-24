@@ -2,8 +2,6 @@ server:
   port: 8484
 
 spring:
-  application:
-    name: api-gateway
   cloud:
     gateway:
       discovery:
@@ -15,46 +13,28 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/users/**
-            - Method=GET,POST,PATCH,DELETE
+            - Method=POST,GET,PATCH,DELETE
           filters:
-            - RewritePath=/users/(?<segment>.*), /$\{segment}
+            - RewritePath=/users/(?<remaining>.*), /$\{remaining}
             - name: CircuitBreaker
               args:
                 name: userServiceCB
                 fallbackUri: forward:/fallback/user
-                statusCodes: 500,502,503,504
             - name: Retry
               args:
                 retries: 3
-                series: SERVER_ERROR
-                methods: GET,POST,PATCH,DELETE
+                methods: POST,GET,PATCH,DELETE
                 backoff:
                   firstBackoff: 100ms
                   maxBackoff: 1000ms
                   factor: 2
 
-        - id: notification
+        - id: notification-service
           uri: lb://notification-service
           predicates:
             - Path=/notification/**
           filters:
-            - RewritePath=/notification/(?<segment>.*), /$\{segment}
-            - name: CircuitBreaker
-              args:
-                name: notificationServiceCB
-                fallbackUri: forward:/fallback/notification
-                statusCodes: 500,502,503,504
-
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
-        - AddRequestHeader=X-Gateway-Request, true
-
-  logging:
-    level:
-      org.springframework.cloud.gateway: TRACE
-      org.springframework.web: DEBUG
-      reactor.netty: DEBUG
-      org.springframework.cloud.commons: DEBUG
+            - RewritePath=/notification/(?<remaining>.*), /$\{remaining}
 
   resilience4j:
     circuitbreaker:
@@ -62,19 +42,10 @@ spring:
         userServiceCB:
           slidingWindowType: COUNT_BASED
           slidingWindowSize: 10
-          minimumNumberOfCalls: 5
-          permittedNumberOfCallsInHalfOpenState: 3
-          waitDurationInOpenState: 10s
           failureRateThreshold: 50
-        notificationServiceCB:
-          slidingWindowType: TIME_BASED
-          slidingWindowSize: 60s
-          minimumNumberOfCalls: 10
-          waitDurationInOpenState: 30s
-          failureRateThreshold: 40
+          waitDurationInOpenState: 10s
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8686/eureka/
-    registry-fetch-interval-seconds: 5
