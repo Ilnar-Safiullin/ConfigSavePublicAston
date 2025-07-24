@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: userApp
+    name: user-service
   jpa:
     show-sql: true
     properties:
