@@ -15,7 +15,9 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/users/**
+            - Method=GET,POST,PATCH,DELETE
           filters:
+            - RewritePath=/users/(?<segment>.*), /$\{segment}
             - name: CircuitBreaker
               args:
                 name: userServiceCB
@@ -25,23 +27,38 @@ spring:
               args:
                 retries: 3
                 series: SERVER_ERROR
-                methods: GET,POST
+                methods: GET,POST,PATCH,DELETE
                 backoff:
                   firstBackoff: 100ms
                   maxBackoff: 1000ms
                   factor: 2
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+
         - id: notification
-          uri: lb://notification
+          uri: lb://notification-service
           predicates:
             - Path=/notification/**
           filters:
+            - RewritePath=/notification/(?<segment>.*), /$\{segment}
             - name: CircuitBreaker
               args:
                 name: notificationServiceCB
                 fallbackUri: forward:/fallback/notification
                 statusCodes: 500,502,503,504
+
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+        - AddRequestHeader=X-Gateway-Request, true
+
+  logging:
+    level:
+      org.springframework.cloud.gateway: TRACE
+      org.springframework.web: DEBUG
+      reactor.netty: DEBUG
+      org.springframework.cloud.commons: DEBUG
 
   resilience4j:
     circuitbreaker:
@@ -64,3 +81,4 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8686/eureka/
+    registry-fetch-interval-seconds: 5
