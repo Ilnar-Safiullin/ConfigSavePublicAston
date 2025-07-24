@@ -1,0 +1,25 @@
+server:
+  port: 8282
+
+spring:
+  application:
+    name: notification-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: userAPP
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+    topic:
+      user:
+        user-created-del-topic: user-created-del-topic
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8686/eureka/

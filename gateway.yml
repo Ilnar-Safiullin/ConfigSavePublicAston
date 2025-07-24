@@ -1,0 +1,66 @@
+server:
+  port: 8484
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userServiceCB
+                fallbackUri: forward:/fallback/user
+                statusCodes: 500,502,503,504
+            - name: Retry
+              args:
+                retries: 3
+                series: SERVER_ERROR
+                methods: GET,POST
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 1000ms
+                  factor: 2
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notification/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: notificationServiceCB
+                fallbackUri: forward:/fallback/notification
+                statusCodes: 500,502,503,504
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+
+  resilience4j:
+    circuitbreaker:
+      instances:
+        userServiceCB:
+          slidingWindowType: COUNT_BASED
+          slidingWindowSize: 10
+          minimumNumberOfCalls: 5
+          permittedNumberOfCallsInHalfOpenState: 3
+          waitDurationInOpenState: 10s
+          failureRateThreshold: 50
+        notificationServiceCB:
+          slidingWindowType: TIME_BASED
+          slidingWindowSize: 60s
+          minimumNumberOfCalls: 10
+          waitDurationInOpenState: 30s
+          failureRateThreshold: 40
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8686/eureka/
