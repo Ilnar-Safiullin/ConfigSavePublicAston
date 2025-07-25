@@ -16,7 +16,8 @@ spring:
           predicates:
             - Path=/users/**
           filters:
-            - RewritePath=/users/(?<remaining>.*), /$\{remaining}
+            - RewritePath=/users/(?<segment>.*), /$\{segment}
+            - SetResponseHeader=Access-Control-Allow-Origin, *
 
 eureka:
   client:
