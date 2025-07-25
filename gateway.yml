@@ -11,13 +11,12 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: user-service-route
+        - id: user-service
           uri: lb://USER-SERVICE
           predicates:
             - Path=/users/**
           filters:
-            - RewritePath=/users/(?<segment>.*), /$\{segment}
-            - SetResponseHeader=Access-Control-Allow-Origin, *
+            - StripPrefix=1  # Удаляет /users из пути
 
 eureka:
   client:
