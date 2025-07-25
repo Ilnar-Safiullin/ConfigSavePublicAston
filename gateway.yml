@@ -8,14 +8,14 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false  # Отключаем автоматическое создание маршрутов
+          enabled: false
       routes:
         - id: user-service
           uri: lb://USER-SERVICE  # Используем имя сервиса из Eureka
           predicates:
             - Path=/users/**
           filters:
-            - RewritePath=/users/(?<segment>.*), /users/$\{segment}  # Сохраняем /users
+            - RewritePath=/users/(?<segment>.*), /users/$\{segment}
             - name: CircuitBreaker
               args:
                 name: userServiceCB
