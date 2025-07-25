@@ -6,25 +6,29 @@ spring:
     name: gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
           predicates:
-            - name: Path
-              args:
-                pattern: "'/'+serviceId.toLowerCase()+'/**'"
+            - Path=/users/**
           filters:
-            - name: RewritePath
-              args:
-                regexp: "'/'+serviceId.toLowerCase()+'/(?<remaining>.*)'"
-                replacement: "'/${remaining}'"
+            - RewritePath=/users/(?<remaining>.*), /$\{remaining}
+        - id: user-service-api
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+          filters:
+            - RewritePath=/user-service/(?<remaining>.*), /$\{remaining}
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
 
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.loadbalancer: DEBUG
