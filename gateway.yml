@@ -54,6 +54,5 @@ logging:
   level:
     org.springframework.cloud.gateway: TRACE
     org.springframework.cloud.circuitbreaker: DEBUG
-    reactor.netty: DEBUG
     com.netflix.discovery: INFO
     org.springframework.web: DEBUG
