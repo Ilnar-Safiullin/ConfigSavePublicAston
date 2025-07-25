@@ -29,5 +29,8 @@ eureka:
 
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.client.discovery: TRACE
+    #org.springframework.cloud.gateway: DEBUG
+    #org.springframework.cloud.client.discovery: TRACE
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: TRACE
+    reactor.netty.http.client: DEBUG
