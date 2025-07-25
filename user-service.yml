@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: user-service
+    name: user-service  # Имя должно совпадать с регистрацией в Eureka
   jpa:
     show-sql: true
     properties:
@@ -35,3 +35,9 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true       # Использовать IP вместо hostname
+    hostname: localhost           # Фиксированный hostname
+    ip-address: 127.0.0.1         # Явное указание IP
+    instance-id: ${spring.application.name}:${server.port}  # Читаемый ID
+    lease-renewal-interval-in-seconds: 5    # Частота обновления
