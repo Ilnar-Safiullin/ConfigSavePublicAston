@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: user-service  # Имя должно совпадать с регистрацией в Eureka
+    name: user-service
   jpa:
     show-sql: true
     properties:
