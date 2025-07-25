@@ -6,20 +6,50 @@ spring:
     name: gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-    loadbalancer:
-      enabled: true
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+      httpclient:
+        pool:
+          max-connections: 1000
+          max-idle-time: 30000
     circuitbreaker:
       resilience4j:
         enabled: true
+        instances:
+          default:
+            register-health-indicator: true
+            sliding-window-type: COUNT_BASED
+            sliding-window-size: 10
+            minimum-number-of-calls: 5
+            permitted-number-of-calls-in-half-open-state: 3
+            wait-duration-in-open-state: 5000
+            failure-rate-threshold: 50
+            event-consumer-buffer-size: 10
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+    fetch-registry: true
+    register-with-eureka: true
+    instance:
+      prefer-ip-address: true
+      lease-renewal-interval-in-seconds: 10
+      lease-expiration-duration-in-seconds: 30
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,circuitbreakers
 
 logging:
   level:
