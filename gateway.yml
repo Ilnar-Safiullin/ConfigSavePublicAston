@@ -10,9 +10,15 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-    circuitbreaker:
-      resilience4j:
-        enabled: true
+          predicates:
+            - name: Path
+              args:
+                pattern: "'/'+serviceId.toLowerCase()+'/**'"
+          filters:
+            - name: RewritePath
+              args:
+                regexp: "'/'+serviceId.toLowerCase()+'/(?<remaining>.*)'"
+                replacement: "'/${remaining}'"
 
 eureka:
   client:
@@ -22,4 +28,3 @@ eureka:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.circuitbreaker: DEBUG
