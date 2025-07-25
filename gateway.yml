@@ -5,16 +5,55 @@ spring:
   application:
     name: gateway
   cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true           # Включает автоматическое создание маршрутов из Eureka
+          lower-case-service-id: true  # Использует имена сервисов в нижнем регистре
+      httpclient:
+        pool:
+          max-connections: 1000   # Настройки пула соединений
+          max-idle-time: 30000
     circuitbreaker:
       resilience4j:
         enabled: true
+        instances:
+          default:
+            register-health-indicator: true
+            sliding-window-type: COUNT_BASED
+            sliding-window-size: 10
+            minimum-number-of-calls: 5
+            permitted-number-of-calls-in-half-open-state: 3
+            wait-duration-in-open-state: 5000
+            failure-rate-threshold: 50
+            event-consumer-buffer-size: 10
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+    fetch-registry: true
+    register-with-eureka: true
+    instance:
+      prefer-ip-address: true
+      lease-renewal-interval-in-seconds: 10
+      lease-expiration-duration-in-seconds: 30
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,circuitbreakers
 
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway: TRACE
     org.springframework.cloud.circuitbreaker: DEBUG
+    reactor.netty: DEBUG
+    com.netflix.discovery: INFO
+    org.springframework.web: DEBUG
