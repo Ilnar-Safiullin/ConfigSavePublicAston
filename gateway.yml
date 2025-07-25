@@ -10,9 +10,13 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-      httpclient:
-        pool:
-          max-idle-time: 30000
+      routes:
+        - id: user-service-route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
+          filters:
+            - RewritePath=/users/(?<remaining>.*), /$\{remaining}
 
 eureka:
   client:
