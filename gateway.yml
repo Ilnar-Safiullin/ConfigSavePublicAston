@@ -33,4 +33,3 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.client: DEBUG
-    com.netflix.discovery: INFO
