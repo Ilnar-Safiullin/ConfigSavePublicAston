@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: user-service
-
   datasource:
     url: jdbc:postgresql://db:5432/users
     username: postgres
@@ -13,7 +12,6 @@ spring:
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
-
   jpa:
     show-sql: true
     hibernate:
@@ -24,24 +22,23 @@ spring:
         jdbc:
           time_zone: UTC
         format_sql: true
-
   kafka:
     bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      enable:
-        idempotence: true
     consumer:
       group-id: user-notification-group
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    topic:
-      user-notifications: user-created-del-topic
 
-  actuator:
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
     health:
+      show-details: always
       db:
         enabled: true
       kafka:
@@ -57,7 +54,6 @@ eureka:
   instance:
     prefer-ip-address: true
     hostname: user-service
-    instance-id: ${spring.application.name}:${spring.application.instance-id:${random.value}}
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
 

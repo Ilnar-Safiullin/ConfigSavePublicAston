@@ -8,11 +8,35 @@ spring:
     bootstrap-servers: kafka:9092
     consumer:
       group-id: userAPP
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    topic:
+      user-notifications: user-created-del-topic
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://discovery-service:8761/eureka/
+    registry-fetch-interval-seconds: 5
+    healthcheck:
+      enabled: true
   instance:
     prefer-ip-address: true
     hostname: notification-service
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: DEBUG
