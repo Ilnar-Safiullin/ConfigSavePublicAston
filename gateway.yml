@@ -14,8 +14,8 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/users/**
-          filters:
-            - RewritePath=/users/(?<segment>.*), /$\{segment}
+          #№filters:
+          # - RewritePath=/users/(?<segment>.*), /$\{segment}
 
 eureka:
   client:
