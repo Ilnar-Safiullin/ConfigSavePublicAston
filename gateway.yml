@@ -8,34 +8,19 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false
+          enabled: true
       routes:
         - id: user-service
-          uri: lb://USER-SERVICE  # Используем имя сервиса из Eureka
+          uri: lb://user-service
           predicates:
             - Path=/users/**
           filters:
-            - RewritePath=/users/(?<segment>.*), /users/$\{segment}
-            - name: CircuitBreaker
-              args:
-                name: userServiceCB
-                fallbackUri: forward:/fallback/user
-            - name: Retry
-              args:
-                retries: 3
-                methods: GET,POST
+            - RewritePath=/users/(?<segment>.*), /$\{segment}
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery-service:8761/eureka/
   instance:
     prefer-ip-address: true
-    ip-address: 127.0.0.1
-    hostname: localhost
-
-logging:
-  level:
-    org.springframework.cloud.gateway: TRACE
-    org.springframework.web: DEBUG
-    reactor.netty.http.client: DEBUG
+    hostname: gateway

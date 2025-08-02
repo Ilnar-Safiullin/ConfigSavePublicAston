@@ -5,27 +5,14 @@ spring:
   application:
     name: notification-service
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: userAPP
-      properties:
-        spring:
-          json:
-            trusted:
-              packages: "*"
-    topic:
-      user:
-        user-created-del-topic: user-created-del-topic
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery-service:8761/eureka/
   instance:
-    prefer-ip-address: true       # Использовать IP вместо hostname
-    hostname: localhost           # Фиксированный hostname
-    ip-address: 127.0.0.1         # Явное указание IP
-    instance-id: ${spring.application.name}:${server.port}  # Читаемый ID
-    lease-renewal-interval-in-seconds: 5    # Частота обновления
+    prefer-ip-address: true
+    hostname: notification-service

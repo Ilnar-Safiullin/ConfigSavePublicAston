@@ -4,8 +4,12 @@ server:
 spring:
   application:
     name: discovery-service
+  profiles:
+    active: docker
 
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+  instance:
+    hostname: discovery-service
